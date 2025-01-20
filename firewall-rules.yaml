@@ -1,0 +1,61 @@
+# Workload 1: tagValues/281478003776759
+# Workload 2: tagValues/281475884025725
+firewallRules:
+  - name: iap-allow-ssh # Allow Identity Aware Proxy to connect to instances via SSH
+    sourceIpRanges:
+      - "35.235.240.0/20"
+    targetSecureTags:
+      - tagValues/281478003776759
+      - tagValues/281475884025725
+    direction: INGRESS
+    deny: false
+    disabled: false
+    layer4Configs:
+      - ipProtocol: tcp
+        ports:
+          - "22"
+  - name: w1-to-google # Allow workload 1 to talk to google.com
+    targetSecureTags:
+      - tagValues/281478003776759 # Workload 1
+    direction: EGRESS
+    deny: false
+    disabled: false
+    destinationFQDNs:
+      - "google.com"
+      - "www.google.com"
+    layer4Configs:
+      - ipProtocol: "tcp"
+        ports:
+          - "80"
+          - "443"
+      - ipProtocol: "icmp"
+  - name: ingress-w2-to-w1 # Workload 1 to accept requests from workload 2
+    sourceSecureTags:
+      - tagValues/281475884025725 # Workload 2
+    targetSecureTags:
+      - tagValues/281478003776759 # Workload 1
+    direction: INGRESS
+    deny: false
+    disabled: false
+    layer4Configs:
+      - ipProtocol: "tcp"
+        ports:
+          - "80"
+      - ipProtocol: "icmp"
+  - name: egress-w2-to-w1 # Allow workload 2 to talk to workload 1
+    targetSecureTags:
+      - tagValues/281475884025725 # Workload 2
+    #sourceIpRanges:
+    #  - "0.0.0.0/0"
+    destinationIpRanges:
+      - "172.20.40.0/24" # Workload 1 (this could be dynamically assigned through IaC)
+    # sourceWorkload: workload2
+    # destinationWorkload: workload1
+    direction: EGRESS
+    deny: false
+    disabled: false
+    layer4Configs:
+      - ipProtocol: "tcp"
+        ports:
+          - "80"
+      - ipProtocol: "icmp"

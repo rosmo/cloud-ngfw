@@ -17,6 +17,22 @@ variable "organization_id" {
   description = "Organization ID"
 }
 
+variable "tag_parent" {
+  type        = string
+  description = "Tag parent"
+}
+
+variable "bootstrap_project_id" {
+  type        = string
+  description = "Bootstrap project for some data sources"
+}
+
+variable "onprem_cidrs" {
+  type        = list(string)
+  description = "List of on-premise CIDRs"
+  default     = ["192.168.0.0/16"]
+}
+
 variable "host_project" {
   type = object({
     project_id         = string
