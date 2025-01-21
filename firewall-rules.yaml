@@ -14,6 +14,7 @@ firewallRules:
       - ipProtocol: tcp
         ports:
           - "22"
+    tlsInspect: true
   - name: w1-to-google # Allow workload 1 to talk to google.com
     targetSecureTags:
       - tagValues/281478003776759 # Workload 1
@@ -29,6 +30,7 @@ firewallRules:
           - "80"
           - "443"
       - ipProtocol: "icmp"
+    tlsInspect: true
   - name: ingress-w2-to-w1 # Workload 1 to accept requests from workload 2
     sourceSecureTags:
       - tagValues/281475884025725 # Workload 2
@@ -42,6 +44,7 @@ firewallRules:
         ports:
           - "80"
       - ipProtocol: "icmp"
+    tlsInspect: true
   - name: egress-w2-to-w1 # Allow workload 2 to talk to workload 1
     targetSecureTags:
       - tagValues/281475884025725 # Workload 2
@@ -59,3 +62,4 @@ firewallRules:
         ports:
           - "80"
       - ipProtocol: "icmp"
+    tlsInspect: false

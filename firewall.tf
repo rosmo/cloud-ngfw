@@ -188,12 +188,12 @@ resource "google_compute_network_firewall_policy_rule" "firewall-rules" {
   priority        = 1000000 + index(keys(local.firewall_rules), each.key)
   disabled        = lookup(each.value, "disabled", false)
 
-  tls_inspect = lookup(each.value, "deny", false) == false && each.value.direction == "INGRESS" ? local.tls_inspect : null
+  tls_inspect = lookup(each.value, "tlsInspect", true) ? local.tls_inspect : false
 
   enable_logging = true
 
-  action                 = lookup(each.value, "deny", false) == true ? "deny" : (each.value.direction == "INGRESS" ? "apply_security_profile_group" : "allow")
-  security_profile_group = lookup(each.value, "deny", false) == false && each.value.direction == "INGRESS" ? local.security_profile_group : null
+  action                 = lookup(each.value, "deny", false) == true ? "deny" : "apply_security_profile_group"
+  security_profile_group = lookup(each.value, "deny", false) == false || (lookup(each.value, "tlsInspect", true) && local.tls_inspect) ? local.security_profile_group : null
 
   dynamic "target_secure_tags" {
     for_each = toset(lookup(each.value, "targetSecureTags", []))
